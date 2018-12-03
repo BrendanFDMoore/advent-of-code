@@ -1,0 +1,12 @@
+{
+  "name": "advent-of-code",
+  "version": "1.0.0",
+  "description": "Solutions for Advent of Code challenges",
+  "main": "index.js",
+  "repository": "git@github.com:BrendanFDMoore/advent-of-code.git",
+  "author": "Brendan Moore <brendan.moore@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "ramda": "^0.26.1"
+  }
+}
