@@ -1,4 +1,3 @@
-console.log('testing');
 const { add2 } = require('../../common/utils');
 const { input } = require('./input');
 
@@ -15,9 +14,7 @@ while (!foundDupe){
   console.log("Round:", runCount);
   tempResults = input.reduce(
     (acc, cur) => {
-      // console.log({acc, cur});
       const next = add2(acc[acc.length-1], cur);
-      // console.log({next});
       if (acc.includes(next)) {
         console.log("Dupe:", next);
         foundDupe = true;
