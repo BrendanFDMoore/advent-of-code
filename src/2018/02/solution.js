@@ -1,4 +1,3 @@
-const { add2 } = require('../../common/utils');
 const { input } = require('./input');
 
 const countLetters = str => [...str].reduce((acc, cur) => ({
@@ -28,3 +27,4 @@ const checksumCounts = prepForChecksums.reduce((acc, cur) => ({
 
 console.log({checksumCounts});
 console.log('Checksum:', checksumCounts.hasThree * checksumCounts.hasTwo);
+
