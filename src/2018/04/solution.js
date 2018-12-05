@@ -58,7 +58,6 @@ const oneGuardData = parsedData.filter(d => d.guard === 2753)
 //console.log("Result:", {oneGuardData});
 
 lastSleepMinute = null;
-let lastDay = 0;
 const oneGuardSleepMinutes = oneGuardData.reduce((acc, cur) => {
   if (cur.awake === false) {
     lastSleepMinute = cur.minute;
@@ -74,4 +73,47 @@ const oneGuardSleepMinutes = oneGuardData.reduce((acc, cur) => {
 }, {})
 
 console.log("Result:", {oneGuardSleepMinutes});
+
+lastSleepMinute = null;
+const allGuardSleepMinutes = parsedData.reduce((acc, cur) => {
+  if (cur.awake === false) {
+    lastSleepMinute = cur.minute;
+    return acc;
+  }
+  if (cur.awake === true && lastSleepMinute) {
+    const sleepMinutes = R.range(lastSleepMinute, cur.minute);
+    lastSleepMinute = null;
+    sleepMinutes.map(m => {
+      if (R.not(R.has(cur.guard, acc))) {
+        acc[cur.guard] = {};
+      }
+      acc[cur.guard][m] = (acc[cur.guard][m]|| 0) + 1
+    });
+    return acc;
+  }
+  return acc;
+}, {})
+
+console.log("Result:", {allGuardSleepMinutes});
+
+const findSleepiestMinute = sleepyMinutes => {
+  let sleepiestMinute = null
+  let maxTimesAsleep = 0;
+  Object.keys(sleepyMinutes).map(m => {
+    if (sleepyMinutes[m]>maxTimesAsleep){
+      maxTimesAsleep = sleepyMinutes[m];
+      sleepiestMinute = m;
+    }
+  });
+  return { sleepiestMinute, maxTimesAsleep };
+}
+
+const sleepiestMinutePerGuard = Object.keys(allGuardSleepMinutes).map(g => {
+  return {
+    guard: g,
+    sleepMinutes: findSleepiestMinute(allGuardSleepMinutes[g]),
+  }
+});
+
+console.log(sleepiestMinutePerGuard);
 
