@@ -28,3 +28,29 @@ const checksumCounts = prepForChecksums.reduce((acc, cur) => ({
 console.log({checksumCounts});
 console.log('Checksum:', checksumCounts.hasThree * checksumCounts.hasTwo);
 
+// Part 2
+const wordDistance = (a, b) =>
+  [...a].reduce((acc, cur, index) => acc + (b[index] !== cur ? 1 : 0), 0)
+
+console.log(wordDistance('abcde', 'bbcde'));
+console.log(wordDistance('abcde', 'bbcdd'));
+console.log(wordDistance('aaaaa', 'abcde'));
+const findClosestWords = words => {
+  let minDistance = words[0].length;
+  let minWords = [];
+  words.map((a, ai) =>{
+    words.map((b, bi) => {
+      if (ai !== bi) {
+        if (wordDistance(a, b) < minDistance) {
+          minWords = [a, b];
+          minDistance = wordDistance(a, b);
+        }
+      }
+    })
+  })
+  return {minWords, minDistance};
+}
+
+console.log(findClosestWords(input));
+
+
