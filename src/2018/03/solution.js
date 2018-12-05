@@ -18,7 +18,7 @@ const parseClaim = s => {
   };
 }
 const claims = input.map(parseClaim);
-console.log(claims);
+// console.log(claims);
 
 const inches = R.range(0,1000);
 const countCol = inches.reduce((a,c)=> ({...a, [c]: 0}))
@@ -41,9 +41,21 @@ const recordClaim = claim => {
   })
 }
 
+const checkClaim = claim => {
+  const cols = R.range(claim.x, claim.x+claim.w);
+  const rows = R.range(claim.y, claim.y+claim.h);
+  let hasDupe = false;
+  cols.map(c => {
+    rows.map( r=> {
+      if (claimCounts[c][r] > 1) { hasDupe = true; }
+    })
+  })
+  return { claim: claim.id, hasDupe}
+}
+
 claims.map(recordClaim);
 
-console.log(claimCounts);
+// console.log(claimCounts);
 
 let multipleClaimedSquareInches = 0;
 inches.map(x => {
@@ -54,5 +66,6 @@ inches.map(x => {
 
 console.log({multipleClaimedSquareInches});
 
+const checkDupes = claims.map(checkClaim);
 
-
+console.log({cleanClaims: checkDupes.filter(d => d.hasDupe === false)});
