@@ -17,12 +17,10 @@ const closestPoint = (point, points) => {
 
 const grid = {};
 const scanRange = R.range(0, 400);
-// const scanRange = R.range(-10, 20);
 scanRange.map( x => {
   grid[x] = {};
   scanRange.map( y => {
     grid[x][y] = closestPoint({ x, y }, points);
-    // grid[x][y] = closestPoint({ x, y }, test);
   })
 })
 // console.log('Result:', {grid});
@@ -44,7 +42,6 @@ const bottomEdge = scanRange.map(x => grid[x][scanRange[scanRange.length-1]]);
 const leftEdge = scanRange.map(y => grid[scanRange[0]][y]);
 const rightEdge = scanRange.map(y => grid[scanRange[scanRange.length-1]][y]);
 
-// console.log(topEdge)
 console.log(R.uniq(topEdge))
 console.log(R.uniq(bottomEdge))
 console.log(R.uniq(leftEdge))
@@ -55,3 +52,21 @@ console.log((bottomEdge.reduce((acc, cur) => ({...acc, [cur]: (acc[cur]||0)+1}),
 console.log((leftEdge.reduce((acc, cur) => ({...acc, [cur]: (acc[cur]||0)+1}), {})))
 console.log((rightEdge.reduce((acc, cur) => ({...acc, [cur]: (acc[cur]||0)+1}), {})))
 
+const totalDistance = (p, points) =>
+  points.reduce((acc, cur) => acc + taxiDistance(p, cur), 0)
+
+const safegrid = {};
+scanRange.map( x => {
+  safegrid[x] = {};
+  scanRange.map( y => {
+    safegrid[x][y] = totalDistance({ x, y }, points);
+  })
+})
+
+let safearea = 0;
+scanRange.map( x => {
+  scanRange.map( y => {
+    if (safegrid[x][y]<10000) {safearea++;}
+  })
+})
+console.log('Result:', {safearea});
