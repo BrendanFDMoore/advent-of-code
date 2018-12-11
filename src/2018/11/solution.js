@@ -4,7 +4,7 @@ const R = require("ramda");
 const SERIAL = 4455;
 const GRID_SIZE = 300;
 const gridSizeRange = R.range(1,301);
-const gridSearchRange = R.range(1,299);
+const gridSearchRange = R.range(1,301);
 
 const getPowerLevel = (x,y,serial) => {
   const rackId = x + 10;
@@ -17,9 +17,10 @@ const getPowerLevel = (x,y,serial) => {
   return power;
 }
 
-console.log(getPowerLevel(122,79, 57), '-5?');
-console.log(getPowerLevel(217,196, 39), '0?');
-console.log(getPowerLevel(101,153, 71), '4?');
+console.log('Test power level Calc');
+console.log(getPowerLevel(122,79, 57), '== -5?');
+console.log(getPowerLevel(217,196, 39), '== 0?');
+console.log(getPowerLevel(101,153, 71), ' == 4?');
 
 const powerLevels = {};
 gridSizeRange.map(x => {
@@ -29,29 +30,38 @@ gridSizeRange.map(x => {
   })
 });
 
-const cellRange = R.range(0,3);
-const getCellTotal = (x,y) => {
+const getCellTotal = (x,y,s) => {
   let cellTotal = 0;
-  cellRange.map(cx => {
-    cellRange.map(cy => {
-      cellTotal += powerLevels[x+cx][y+cy];
+  const cellRange = R.range(0,s);
+  cellRange.map((cx, cxi) => {
+    cellRange.map((cy, cyi) => {
+      cellTotal += (powerLevels[x+cx][y+cy]||0);
     })
   });
   return cellTotal;
 }
 
 // console.log(powerLevels[1])
-let maxX, maxY, maxCell = -100000;
-gridSearchRange.map(x => {
-  gridSearchRange.map(y => {
-    const tempCell = getCellTotal(x,y);
-    if (tempCell > maxCell) {
-      maxX = x;
-      maxY = y;
-      maxCell = tempCell;
-    }
-  })
+const cellSizeSearchRange = R.range(3,4);
+
+let maxX, maxY, maxSize, maxCell = -100000;
+cellSizeSearchRange.map(s => {
+  console.log({currentCellSize: s});
+  gridSearchRange.map(x => {
+      if ((x + (s-1) > GRID_SIZE)) return;
+      gridSearchRange.map(y => {
+      if ((y + (s-1) > GRID_SIZE)) return;
+      const tempCell = getCellTotal(x,y,s);
+      if (tempCell > maxCell) {
+        maxX = x;
+        maxY = y;
+        maxSize = s;
+        maxCell = tempCell;
+      }
+    })
+  });
+  console.log({cellSize: s, maxX, maxY, maxSize, maxCell})
 });
 
-console.log({maxX, maxY, maxCell})
+console.log({maxX, maxY, maxSize, maxCell})
 
