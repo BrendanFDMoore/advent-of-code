@@ -43,10 +43,10 @@ xScan.map(x => {
     trackMap[x][y] = trackForInput(inputCell);
     liveMap[x][y] = trackForInput(inputCell);
     if (cartTypes.includes(inputCell)) {
-      cartMap[x][y] = true;
+      cartMap[x][y] = carts.length+1;
       liveMap[x][y] = TRAIN;
       carts.push({
-        id: carts.length,
+        id: carts.length+1,
         x,
         y,
         dir: cartDirections[inputCell],
@@ -103,21 +103,33 @@ const getNextIntersectionDirection = (direction, turns) => {
   return nextIntersectionDirections[direction][turnType];
 }
 
-const checkCollision = ({x, y}) => {
-  if (cartMap[x][y] === true) {
-    throw new Error(`💥💥💥💥💥 Collision at (${x}, ${y}), after tick ${tick}! 💥💥💥💥💥`)
-  }
+let deadCarts = [];
+const killCart = cart => {
+  console.log({cart});
+  
+  deadCarts.push(cart.id);
+  console.log({deadCarts});
+}
+const checkCollision = ({x, y}, cart) => {
+  // console.log('');
+  if (cartMap[x][y]) {
+    // throw new Error(`💥💥💥💥💥 Collision at (${x}, ${y}), after tick ${tick}! 💥💥💥💥💥`)
+    console.log(`💥💥💥💥💥 Collision at (${x}, ${y}), after tick ${tick}, with ${cartMap[x][y]} ! 💥💥💥💥💥`)
+    const otherCart = carts.find(c => c.id === cartMap[x][y] );
+    killCart(cart);
+    killCart(otherCart);
+}
 }
 
 const moveCart = (cart) => {
   const {x, y} = getNextLocation(cart);
-  checkCollision({x, y});
+  checkCollision({x, y}, cart);
   const cell = getMapCell({x, y});
   const nextDir = getNextDirection(cell, cart);
   const nextTurns = getNextTurnCount(cell, cart.turns);
   liveMap[cart.x][cart.y] = trackMap[cart.x][cart.y];
   cartMap[cart.x][cart.y] = false;
-  cartMap[x][y] = true;
+  cartMap[x][y] = cart.id;
   liveMap[x][y] = TRAIN;
   return {
     id: cart.id,
@@ -141,12 +153,33 @@ const moveAllCarts = () => {
 
 console.log('Sorted Carts?');
 console.log(sortCarts(carts));
+console.log({numCarts: carts.length});
+
+const checkRemainingCarts = () => {
+  carts.filter(c => deadCarts.includes(c.id)).map(c => {
+    liveMap[c.x][c.y] = trackMap[c.x][c.y];
+    cartMap[c.x][c.y] = false;
+  });
+  carts = carts.filter(c => !deadCarts.includes(c.id));
+  console.log({remainingCarts: carts.length})
+  if (carts.length === 1) {
+    console.log('🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑')
+    console.log({lastCart: carts[0]})
+    console.log('🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑🛑')
+    throw new Error('Last cart.')
+  }
+}
 
 let tick = 0;
-while (tick < 10000) {
+while (tick < 20000) {
   console.log({tick})
   // query('Do next tick? [press enter]', true);
   moveAllCarts();
+  checkRemainingCarts();
+  // carts = carts.filter(c => !deadCarts.includes(c.id));
+  // if (remainingCarts.length === 1) {
+  //   console.log({lastCart: remainingCarts[0]})
+  // }
   // console.log(carts);
   // console.log(carts.filter(c => c.id === 4));
   // printMap();
