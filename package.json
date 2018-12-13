@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "circular-list": "^0.0.2",
+    "cli-interact": "^0.1.9",
     "ramda": "^0.26.1"
   }
 }
