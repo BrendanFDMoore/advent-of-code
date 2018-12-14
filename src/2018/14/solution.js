@@ -3,10 +3,9 @@ const CircularList = require("circular-list");
 const { add2 } = require('../../common/utils');
 
 const TARGET_LENGTH = 47801;
-// const TARGET_LENGTH = 9;
+const TARGET_SEQ = '047801'; // '047801'; // '59414' takes 2018
 
-const PLAYERS = 455;
-const LAST_MARBLE = 71223;
+// const TARGET_LENGTH = 9;
 
 let scores = {};
 const findMaxScore = scoreObj => {
@@ -23,34 +22,65 @@ const convertCircularListToArray = (list) => {
 }
 
 let scoreboard = new CircularList();
+let tailScores = new CircularList();
+let tailScoresLength = 0;
+let tailString = '';
 
 var first = new CircularList.Node(3)
 var second = new CircularList.Node(7)
 scoreboard.append(first);
 scoreboard.append(second);
-let recipeCount = 2;
-let firstElfRecipe = first;
-let secondElfRecipe = second;
+scoreboard.append(new CircularList.Node(1));
+scoreboard.append(new CircularList.Node(0));
+scoreboard.append(new CircularList.Node(1));
+scoreboard.append(new CircularList.Node(0));
+// tailString = '71010';
 
-// const getBefore = (current, offset = 1) => {
-//   if (offset === 0) return current;
-//   return getBefore(current.prev, offset - 1);
-// }
+// let recipeCount = 2;
+// let firstElfRecipe = first;
+// let secondElfRecipe = second;
+let firstElfRecipe = scoreboard.last.prev;
+let secondElfRecipe = scoreboard.last.prev.prev;
+let recipeCount = 6;
+
+const getBefore = (current, offset = 1) => {
+  if (offset === 0) return current;
+  return getBefore(current.prev, offset - 1);
+}
 const getAfter = (current, offset = 1) => {
   if (offset === 0) return current;
   return getAfter(current.next, offset - 1);
 }
- let lastTen = [];
+let lastTen = [];
+
+let foundTail = false;
 
 const addNewRecipes = () => {
   const scoreTotal = firstElfRecipe.data + secondElfRecipe.data;
-  console.log({scoreTotal});
+  // console.log({scoreTotal});
   [...(scoreTotal.toString())].forEach(d => {
     scoreboard.append(new CircularList.Node(parseInt(d)))
     recipeCount+=1;
-    if (recipeCount>TARGET_LENGTH) {
-      lastTen.push((d));
-      console.log('Adding:', {d})
+    // if (tailScoresLength >= TARGET_SEQ.length) {
+    //   tailScores.remove(tailScores.first);
+    //   tailScoresLength+=-1;
+    // }
+    // tailScores.remove(tailScores.first);
+    // tailScores.append(new CircularList.Node(d))
+    // tailScoresLength+=1;
+    // if (recipeCount>TARGET_LENGTH) {
+    //   lastTen.push((d));
+    //   console.log('Adding:', {d})
+    // }
+    const tempTail = getRecipeTail();
+    // console.log('getRecipeTail:', tempTail)
+    if (tempTail === TARGET_SEQ) {
+      foundTail = true;
+      console.log('🔍🔍🔍🔍🔍🔍🔍🔍 FOUND TAIL 🔍🔍🔍🔍🔍🔍🔍')
+      console.log({recipeCount});
+      console.log('🔻👇🔻👇🔻👇🔻👇🔻👇🔻👇🔻👇')
+      console.log({countMinusTail: recipeCount - TARGET_SEQ.length});
+      console.log('🔺👆🔺👆🔺👆🔺👆🔺👆🔺👆🔺👆')
     }
   })
 }
@@ -60,15 +90,56 @@ const moveElves = () => {
    secondElfRecipe = getAfter(secondElfRecipe, secondElfRecipe.data + 1);
 }
 
-while (recipeCount< (TARGET_LENGTH+10)){
-  console.log({recipeCount});
-  addNewRecipes();
-  moveElves();
+const getRecipeTail = () => {
+  let tail = `${scoreboard.last.data}`;
+  let prev = scoreboard.last;
+  R.range(1,TARGET_SEQ.length).map(n => {
+    prev = getBefore(prev);
+    // tail.push(prev.data);
+    tail = prev.data+tail;
+  });
+  // const joinTail = tail.reverse().join('');
+  // console.log({joinTail});
+  // return joinTail;
+  // console.log({tail});
+  return tail;
 }
 
-console.log(lastTen);
+const updateTailString = () => {
+  // console.log({tailScores})
+  tailString = '';
+  tailString = tailScores.each(s => {
+    // console.log({data: s})
+    tailString = tailString + s;
+  })
+  console.log({tailString})
+}
+
+// Part 1
+// while (recipeCount< (TARGET_LENGTH+10)){
+//   console.log({recipeCount});
+//   addNewRecipes();
+//   moveElves();
+// }
+
+// while (tailString !== TARGET_SEQ && recipeCount<2030){
+// while (tailString !== TARGET_SEQ ){
+while(!foundTail) {
+  addNewRecipes();
+  moveElves();
+  // console.log({recipeCount});
+  if(recipeCount % 1000 === 0){
+    console.log({recipeCount});
+  }
+  // updateTailString();
+  // console.log({tailString})
+}
+console.log({recipeCount});
+console.log({ tail: getRecipeTail() });
+console.log({lastTen});
 console.log({lastTenLen: lastTen.length});
 const total = lastTen.reduce(add2, 0);
 console.log({total});
+console.log({countMinusTail: recipeCount - TARGET_SEQ.length});
 
 // WRONG [ '1', '3', '4', '2', '3', '1', '6', '4', '1', '0' ] = 25
