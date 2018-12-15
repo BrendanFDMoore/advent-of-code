@@ -53,7 +53,9 @@ const playTurn = () => {
 }
 
 // while(!targetScoreHit && nextMarbleNumber < LAST_MARBLE*100) {
-while(nextMarbleNumber < LAST_MARBLE) {
+const start = Date.now();
+console.log({start})
+while(nextMarbleNumber < LAST_MARBLE+1) {
   console.log(`Player [${currentPlayer}], next marble ${nextMarbleNumber}, Current Marble @ ${currentMarblePosition}`)
   playTurn();
   console.log(`Current Marble @ ${currentMarblePosition}`)
@@ -67,6 +69,10 @@ console.log(`Current Marble @ ${currentMarblePosition}`)
 // console.log(playedMarbles.join(' '))
 
 console.log('Max score:', findMaxScore(scores));
+const end = Date.now();
+console.log({end})
+console.log({duration: end-start})
+
 // console.log(debugLastScore);
 
 // WRONG

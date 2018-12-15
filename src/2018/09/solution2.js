@@ -80,11 +80,16 @@ const playTurn = () => {
   incrementPlayer();
 }
 
+const start = Date.now();
+console.log({start})
 while(nextMarbleNumber < (LAST_MARBLE*100)+1 ) {
   if (nextMarbleNumber % 100 === 0){
     console.log(`Player [${currentPlayer}], next marble ${nextMarbleNumber}, Current Marble ${currentMarble}`)
   }
   playTurn();
 }
+const end = Date.now();
+console.log({end})
+console.log({duration: end-start})
 
 console.log('Max score:', findMaxScore(scores));
